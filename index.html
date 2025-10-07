@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title data-i18n="title">Medya Gönder & Oynat</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="container header">
+    <div class="brand">📺 MediaCast</div>
+    <nav class="lang">
+      <label for="lang" data-i18n="language">Dil</label>
+      <select id="lang">
+        <option value="tr">Türkçe</option>
+        <option value="en">English</option>
+        <option value="de">Deutsch</option>
+      </select>
+    </nav>
+  </header>
+
+  <main class="container hero">
+    <h1 data-i18n="hero_title">Telefonundan yükle, ekranda oynat</h1>
+    <p class="muted" data-i18n="hero_sub">
+      Müşterine özel güvenli panel: foto/video yükle, sırayla ya da karışık oynat.
+    </p>
+    <div class="cta">
+      <a id="panelLink" class="btn" target="_blank" rel="noopener" data-i18n="open_panel">Yönetim Paneline Git</a>
+    </div>
+    <p class="tiny muted" data-i18n="panel_hint">
+      (Bağlantıyı deploy sonrası kendi panel alan adınla güncelle)
+    </p>
+  </main>
+
+  <section class="container features">
+    <div class="card">
+      <h3 data-i18n="feat_secure_title">Güvenli Çoklu Müşteri</h3>
+      <p data-i18n="feat_secure_desc">Her müşteriye özel hesap, cihaz token’ı ve izole medya alanı.</p>
+    </div>
+    <div class="card">
+      <h3 data-i18n="feat_loop_title">Oynatma Kontrolü</h3>
+      <p data-i18n="feat_loop_desc">Sırayla/karışık döngü, resim süresi ve video tekrarı ayarlanabilir.</p>
+    </div>
+    <div class="card">
+      <h3 data-i18n="feat_pi_title">Raspberry Pi Uyumlu</h3>
+      <p data-i18n="feat_pi_desc">Pi oynatıcı token ile playlist’i çeker, indirir ve tam ekranda oynatır.</p>
+    </div>
+  </section>
+
+  <footer class="container footer">
+    <span class="muted tiny">© <span id="year"></span> MediaCast</span>
+  </footer>
+
+  <script>
+    // ---- Basit i18n sözlüğü ----
+    const I18N = {
+      tr: {
+        title: "Medya Gönder & Oynat",
+        language: "Dil",
+        hero_title: "Telefonundan yükle, ekranda oynat",
+        hero_sub: "Müşterine özel güvenli panel: foto/video yükle, sırayla ya da karışık oynat.",
+        open_panel: "Yönetim Paneline Git",
+        panel_hint: "(Bağlantıyı deploy sonrası kendi panel alan adınla güncelle)",
+        feat_secure_title: "Güvenli Çoklu Müşteri",
+        feat_secure_desc: "Her müşteriye özel hesap, cihaz token’ı ve izole medya alanı.",
+        feat_loop_title: "Oynatma Kontrolü",
+        feat_loop_desc: "Sırayla/karışık döngü, resim süresi ve video tekrarı ayarlanabilir.",
+        feat_pi_title: "Raspberry Pi Uyumlu",
+        feat_pi_desc: "Pi oynatıcı token ile playlist’i çeker, indirir ve tam ekranda oynatır.",
+      },
+      en: {
+        title: "Send Media & Play",
+        language: "Language",
+        hero_title: "Upload from your phone, play on screens",
+        hero_sub: "Secure panel per customer: upload photos/videos, play in order or shuffled.",
+        open_panel: "Open Admin Panel",
+        panel_hint: "(Update this link to your panel domain after deploy)",
+        feat_secure_title: "Secure Multi-Tenant",
+        feat_secure_desc: "Dedicated account, device token and isolated media per customer.",
+        feat_loop_title: "Playback Control",
+        feat_loop_desc: "Order/shuffle loop, per-image duration and video repeat counts.",
+        feat_pi_title: "Raspberry Pi Ready",
+        feat_pi_desc: "The Pi player pulls the playlist via token, caches and plays fullscreen.",
+      },
+      de: {
+        title: "Medien senden & abspielen",
+        language: "Sprache",
+        hero_title: "Vom Handy hochladen, auf Displays abspielen",
+        hero_sub: "Sicheres Panel pro Kunde: Fotos/Videos hochladen, der Reihe nach oder zufällig abspielen.",
+        open_panel: "Admin-Panel öffnen",
+        panel_hint: "(Diesen Link nach dem Deploy auf deine Panel-Domain anpassen)",
+        feat_secure_title: "Sicheres Multi-Tenant",
+        feat_secure_desc: "Eigenes Konto, Geräte-Token und isolierte Medien je Kunde.",
+        feat_loop_title: "Wiedergabesteuerung",
+        feat_loop_desc: "Reihenfolge/Zufallsschleife, Bilddauer und Videowiederholungen einstellbar.",
+        feat_pi_title: "Raspberry Pi-Ready",
+        feat_pi_desc: "Der Pi-Player lädt die Playlist per Token, cached und spielt im Vollbild.",
+      }
+    };
+
+    const DEFAULT_LANG = localStorage.getItem("lang")
+      || new URLSearchParams(location.search).get("lang")
+      || (navigator.language || "tr").slice(0,2);
+    const LANG = ["tr","en","de"].includes(DEFAULT_LANG) ? DEFAULT_LANG : "tr";
+
+    function applyI18n(lang) {
+      document.documentElement.lang = lang;
+      const dict = I18N[lang];
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key]) el.textContent = dict[key];
+      });
+      document.title = dict.title || document.title;
+    }
+
+    // Panel linkini (deploy sonrası) buraya yaz:
+    const PANEL_DOMAIN = "https://panel.senin-domainin.com"; // ← BUNU KENDİ PANEL ALAN ADINLA DEĞİŞTİR
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("year").textContent = new Date().getFullYear();
+      const langSel = document.getElementById("lang");
+      langSel.value = LANG;
+      applyI18n(LANG);
+      langSel.addEventListener("change", () => {
+        localStorage.setItem("lang", langSel.value);
+        applyI18n(langSel.value);
+      });
+      const panelLink = document.getElementById("panelLink");
+      panelLink.href = PANEL_DOMAIN || "#";
+    });
+  </script>
+</body>
+</html>
